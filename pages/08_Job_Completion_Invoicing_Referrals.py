@@ -1,4 +1,6 @@
-import streamlit as st, pandas as pd, os
+import streamlit as st
+import pandas as pd
+import os
 from datetime import date, timedelta, datetime
 from utils.ui import bootstrap, section
 
@@ -9,7 +11,8 @@ REF_DIR = os.path.join(ROOT, "assets", "referrals")
 conn = bootstrap()
 section("Job Completion → Invoicing → Referrals", "Close the loop on each job")
 
-os.makedirs(UPLOAD_DIR, exist_ok=True); os.makedirs(REF_DIR, exist_ok=True)
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(REF_DIR, exist_ok=True)
 
 st.subheader("Mark Job Done & Upload Photos")
 jid = st.number_input("Job ID", min_value=1, step=1)
@@ -18,7 +21,8 @@ if st.button("Mark Done & Save Photos"):
     conn.execute("UPDATE jobs SET status='Done' WHERE id=?", (jid,))
     for ph in photos or []:
         save_path = os.path.join(UPLOAD_DIR, f"job{jid}_{ph.name}")
-        with open(save_path, "wb") as f: f.write(ph.getbuffer())
+        with open(save_path, "wb") as f:
+            f.write(ph.getbuffer())
         conn.execute("INSERT INTO job_photos(job_id, file_path) VALUES (?,?)", (jid, save_path))
     conn.commit()
     st.success("Job marked done and photos saved.")
@@ -65,7 +69,8 @@ small{{color:#6C715F;}}
 <blockquote>{text}</blockquote>
 <p><small>Saved: {datetime.now().strftime("%d %b %Y %H:%M")}</small></p>
 </body></html>"""
-    with open(path, "w", encoding="utf-8") as f: f.write(html)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(html)
     return path
 
 if st.button("Save Referral"):
@@ -75,12 +80,10 @@ if st.button("Save Referral"):
     p = save_referral_html(jid, customer, ref_text)
     st.success(f"Referral saved. HTML: {os.path.basename(p)}")
 
-with st.expander("Referral Repository", expanded=False):
-    files = sorted([f for f in os.listdir(REF_DIR) if f.endswith(".html")])
-    if files:
-        sel = st.selectbox("Preview a referral", files)
-        if sel:
-            with open(os.path.join(REF_DIR, sel), "r", encoding="utf-8") as f:
-                st.components.v1.html(f.read(), height=260, scrolling=True)
-    else:
-        st.caption("No referral files yet.")
+st.subheader("Referral Repository")
+files = sorted([f for f in os.listdir(REF_DIR) if f.endswith(".html")])
+if files:
+    for f in files:
+        st.markdown(f"- {f}")
+else:
+    st.caption("No referral files yet.")
