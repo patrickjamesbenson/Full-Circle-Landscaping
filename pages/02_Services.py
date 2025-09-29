@@ -3,7 +3,7 @@ import pandas as pd
 from utils.ui import bootstrap, section
 
 conn = bootstrap()
-section("Services (Seasonal & Ongoing)", "Add/edit services and tag by season")
+section("Services", "Add/edit services and tag by season")
 
 with st.form("add_service"):
     name = st.text_input("Service name")

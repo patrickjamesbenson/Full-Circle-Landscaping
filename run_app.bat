@@ -26,7 +26,7 @@ if errorlevel 1 (
 )
 echo.
 echo === Launching app ===
-"%PY_EXE%" -m streamlit run app.py
+"%PY_EXE%" -m streamlit run Full_Circle-Home.py
 echo.
 echo If the browser didn't open automatically, visit: http://localhost:8501
 pause

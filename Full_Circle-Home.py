@@ -3,7 +3,7 @@ from datetime import timedelta, date
 import pandas as pd
 from utils.ui import bootstrap, brand_hero
 
-st.set_page_config(page_title="Full Circle Control Centre", layout="wide")
+st.set_page_config(page_title="Home", layout="wide")
 conn = bootstrap()
 
 brand_hero()
