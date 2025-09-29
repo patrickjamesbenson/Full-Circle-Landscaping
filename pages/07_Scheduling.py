@@ -1,13 +1,37 @@
 import streamlit as st
 import pandas as pd
-from datetime import date
+from datetime import date, timedelta
 from utils.ui import bootstrap, section
 from utils.db import get_conn
 
 conn = bootstrap()
 section("Scheduling", "Assign jobs, dates, and crew; keep 1–2 weeks ahead")
 
-st.subheader("Jobs (Scheduled/All)")
+# Quick calendar (next 7 days)
+st.subheader("Next 7 Days — Calendar")
+start = date.today()
+end = start + timedelta(days=6)
+dfw = pd.read_sql_query("""
+SELECT j.id, j.scheduled_date, j.start_time, j.end_time, j.crew, j.status,
+       l.name as customer, l.suburb
+FROM jobs j
+LEFT JOIN quotes q ON j.quote_id=q.id
+LEFT JOIN leads l ON q.lead_id=l.id
+WHERE date(j.scheduled_date) BETWEEN ? AND ?
+ORDER BY date(j.scheduled_date), time(j.start_time)
+""", conn, params=(start.isoformat(), end.isoformat()))
+cols = st.columns(7)
+for i in range(7):
+    d = start + timedelta(days=i)
+    with cols[i]:
+        st.markdown(f"**{d.strftime('%a %d %b')}**")
+        dd = dfw[dfw["scheduled_date"] == d.isoformat()]
+        if dd.empty: st.caption("—")
+        else:
+            for _, r in dd.iterrows():
+                st.write(f"#{int(r['id'])} {r['start_time']}-{r['end_time']} — {r['customer']}")
+
+st.subheader("Jobs (All)")
 df = pd.read_sql_query("""
 SELECT j.id, j.scheduled_date, j.start_time, j.end_time, j.crew, j.status, q.id as quote_id, l.name as customer, l.suburb
 FROM jobs j
@@ -15,7 +39,7 @@ LEFT JOIN quotes q ON j.quote_id=q.id
 LEFT JOIN leads l ON q.lead_id=l.id
 ORDER BY COALESCE(j.scheduled_date, '9999-12-31') ASC, j.start_time ASC
 """, conn)
-st.dataframe(df, use_container_width=True, height=350)
+st.dataframe(df, use_container_width=True, height=300)
 
 st.subheader("Update / Assign Job")
 jid = st.number_input("Job ID", min_value=1, step=1)
@@ -23,13 +47,13 @@ col1, col2, col3 = st.columns(3)
 with col1:
     d = st.date_input("Date", value=date.today())
 with col2:
-    start = st.text_input("Start (HH:MM)", value="08:00")
+    start_t = st.text_input("Start (HH:MM)", value="08:00")
 with col3:
-    end = st.text_input("End (HH:MM)", value="11:00")
+    end_t = st.text_input("End (HH:MM)", value="11:00")
 crew = st.text_input("Crew (semicolon-separated)", value="Tony;Sam")
 status = st.selectbox("Status", ["Scheduled","In Progress","Done","Invoiced"], index=0)
 if st.button("Save scheduling"):
     conn.execute("""UPDATE jobs SET scheduled_date=?, start_time=?, end_time=?, crew=?, status=? WHERE id=?""",
-                 (d.isoformat(), start, end, crew, status, jid))
+                 (d.isoformat(), start_t, end_t, crew, status, jid))
     conn.commit()
     st.success("Job updated.")

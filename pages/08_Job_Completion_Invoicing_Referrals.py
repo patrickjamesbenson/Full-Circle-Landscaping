@@ -1,21 +1,24 @@
 import streamlit as st
 import pandas as pd
 import os
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from utils.ui import bootstrap, section
 from utils.db import get_conn
 
-UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "assets", "uploads")
+UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "uploads")
+REF_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "referrals")
 
 conn = bootstrap()
 section("Job Completion → Invoicing → Referrals", "Close the loop on each job")
+
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(REF_DIR, exist_ok=True)
 
 st.subheader("Mark Job Done & Upload Photos")
 jid = st.number_input("Job ID", min_value=1, step=1)
 photos = st.file_uploader("Upload photos", type=["png","jpg","jpeg"], accept_multiple_files=True)
 if st.button("Mark Done & Save Photos"):
     conn.execute("UPDATE jobs SET status='Done' WHERE id=?", (jid,))
-    os.makedirs(UPLOAD_DIR, exist_ok=True)
     for ph in photos or []:
         save_path = os.path.join(UPLOAD_DIR, f"job{jid}_{ph.name}")
         with open(save_path, "wb") as f:
@@ -47,8 +50,40 @@ st.subheader("Ask for Referral")
 customer = st.text_input("Customer name")
 ref_text = st.text_area("Referral text (paste from customer)", height=120)
 permission = st.checkbox("Permission to publish", value=True)
+
+def save_referral_html(job_id:int, customer:str, text:str):
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    fname = f"ref_job{job_id}_{ts}.html"
+    path = os.path.join(REF_DIR, fname)
+    html = f"""<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Referral - {customer}</title>
+<style>
+body{{font-family:Georgia,serif;background:#F0EBDD;color:#34382F;padding:24px;}}
+blockquote{{font-size:1.2rem;line-height:1.5;border-left:4px solid #C6723D;margin:0;padding-left:16px;}}
+small{{color:#6C715F;}}
+</style></head>
+<body>
+<h2>Full Circle Gardens — Customer Referral</h2>
+<p><strong>Customer:</strong> {customer}</p>
+<blockquote>{text}</blockquote>
+<p><small>Saved: {datetime.now().strftime("%d %b %Y %H:%M")}</small></p>
+</body></html>"""
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(html)
+    return path
+
 if st.button("Save Referral"):
     conn.execute("""INSERT INTO referrals(job_id, customer_name, text, permission, created_at) VALUES (?,?,?,?,datetime('now'))""",
                  (jid, customer, ref_text, 1 if permission else 0))
     conn.commit()
-    st.success("Referral saved.")
+    p = save_referral_html(jid, customer, ref_text)
+    st.success(f"Referral saved. HTML: {os.path.basename(p)}")
+
+st.subheader("Referral Repository")
+files = sorted([f for f in os.listdir(REF_DIR) if f.endswith(".html")])
+if files:
+    for f in files:
+        st.markdown(f"- {f}")
+else:
+    st.caption("No referral files yet.")
