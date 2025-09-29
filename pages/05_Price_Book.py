@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 from utils.ui import bootstrap, section
-from utils.db import get_conn
 
 conn = bootstrap()
 section("Price Book", "Define items and rates (used by quotes)")
@@ -20,4 +19,4 @@ with st.form("add_item"):
         st.success("Item added.")
 
 df = pd.read_sql_query("SELECT id, name, category, unit, unit_rate, notes FROM price_items ORDER BY category, name", conn)
-st.dataframe(df, use_container_width=True)
+st.dataframe(df, width='stretch')

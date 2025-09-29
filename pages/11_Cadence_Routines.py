@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from datetime import date
 from utils.ui import bootstrap, section
-from utils.db import get_conn
 
 conn = bootstrap()
 section("Cadence — Daily / Weekly / Monthly", "Schedule your internal routines")
@@ -27,8 +26,8 @@ with st.form("add_task"):
         conn.commit()
         st.success("Task added.")
 
-df = pd.read_sql_query("""SELECT id, name, frequency, day_of_week, day_of_month, hour, minute, owner, active FROM cadence_tasks""", conn)
-st.dataframe(df, use_container_width=True)
+df = pd.read_sql_query("SELECT id, name, frequency, day_of_week, day_of_month, hour, minute, owner, active FROM cadence_tasks", conn)
+st.dataframe(df, width='stretch')
 
 st.subheader("Mark as Done")
 tid = st.number_input("Task ID", 1, step=1)

@@ -3,10 +3,10 @@ import pandas as pd
 import os
 from datetime import date, timedelta, datetime
 from utils.ui import bootstrap, section
-from utils.db import get_conn
 
-UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "uploads")
-REF_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "referrals")
+ROOT = os.path.dirname(os.path.dirname(__file__))
+UPLOAD_DIR = os.path.join(ROOT, "assets", "uploads")
+REF_DIR = os.path.join(ROOT, "assets", "referrals")
 
 conn = bootstrap()
 section("Job Completion → Invoicing → Referrals", "Close the loop on each job")

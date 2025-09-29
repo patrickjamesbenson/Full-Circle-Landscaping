@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 from utils.ui import bootstrap, section
-from utils.db import get_conn
 
 conn = bootstrap()
 section("Lead Generation Plan & ROI", "Track channels, costs, leads, quotes, jobs, and revenue")
@@ -16,9 +15,9 @@ with st.form("add_channel"):
         conn.commit()
         st.success("Channel added.")
 
-channels = pd.DataFrame(conn.execute("SELECT * FROM channels").fetchall())
+channels = pd.read_sql_query("SELECT * FROM channels", conn)
 if not channels.empty:
-    st.dataframe(channels, use_container_width=True)
+    st.dataframe(channels, width='stretch')
 
 st.subheader("Monthly Metrics")
 col1, col2, col3 = st.columns(3)
@@ -55,4 +54,4 @@ SELECT c.name as channel, l.month, l.cost, l.leads, l.quotes, l.jobs, l.revenue,
 FROM leadgen_stats l JOIN channels c ON l.channel_id=c.id
 ORDER BY l.month DESC, channel
 """, conn)
-st.dataframe(stats, use_container_width=True)
+st.dataframe(stats, width='stretch')

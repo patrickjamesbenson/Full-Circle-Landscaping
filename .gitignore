@@ -10,15 +10,14 @@ dist/
 # Streamlit
 .streamlit/
 
-# OS
+# OS junk
 .DS_Store
 Thumbs.db
 
-# Local data/logs
+# Local data/uploads
 data/*.db
-data/*.sqlite
-data/*.log
 assets/uploads/
+assets/referrals/
 
 # Envs/IDE
 .venv/

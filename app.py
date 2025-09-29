@@ -1,15 +1,13 @@
 import streamlit as st
-from datetime import datetime, timedelta, date
+from datetime import timedelta, date
 import pandas as pd
-from utils.ui import bootstrap, section, brand_hero
+from utils.ui import bootstrap, brand_hero
 
 st.set_page_config(page_title="Full Circle Control Centre", layout="wide")
 conn = bootstrap()
 
-# Brand lockup
 brand_hero()
 
-# ---- KPIs ----
 col1, col2, col3, col4 = st.columns(4)
 with col1:
     total_rev = conn.execute("SELECT ROUND(SUM(total),2) as r FROM invoices WHERE status='Paid'").fetchone()["r"] or 0
@@ -26,7 +24,6 @@ with col4:
 
 st.divider()
 
-# ---- Weekly schedule ----
 def week_bounds(d: date):
     monday = d - timedelta(days=d.weekday())
     sunday = monday + timedelta(days=6)
@@ -37,16 +34,14 @@ this_mon, this_sun = week_bounds(today)
 last_mon, last_sun = week_bounds(today - timedelta(days=7))
 next_mon, next_sun = week_bounds(today + timedelta(days=7))
 
-# Revenue figures
 def paid_between(d1, d2):
     r = conn.execute(
         "SELECT SUM(total) as r FROM invoices WHERE status='Paid' AND date(issue_date) BETWEEN ? AND ?",
         (d1.isoformat(), d2.isoformat())
     ).fetchone()["r"]
-    return r or 0.0
+    return float(r or 0.0)
 
 def expected_between(d1, d2):
-    # Sum accepted quote totals for jobs scheduled in range; fallback to invoices if already created
     r = conn.execute(
         """
         SELECT COALESCE(SUM(q.total),0) as tot
@@ -56,10 +51,15 @@ def expected_between(d1, d2):
         """, (d1.isoformat(), d2.isoformat())
     ).fetchone()["tot"]
     inv = conn.execute(
-        "SELECT COALESCE(SUM(total),0) as tot FROM invoices i JOIN jobs j ON i.job_id=j.id WHERE date(j.scheduled_date) BETWEEN ? AND ?",
+        """
+        SELECT COALESCE(SUM(i.total),0) as tot
+        FROM invoices i
+        JOIN jobs j ON i.job_id=j.id
+        WHERE date(j.scheduled_date) BETWEEN ? AND ?
+        """,
         (d1.isoformat(), d2.isoformat())
     ).fetchone()["tot"]
-    return max(r, inv or 0.0)
+    return float(max(r or 0.0, inv or 0.0))
 
 c1, c2, c3 = st.columns(3)
 with c1:
@@ -70,7 +70,6 @@ with c3:
     st.metric(f"Expected next week ({next_mon:%d %b}–{next_sun:%d %b})", f"${expected_between(next_mon,next_sun):,.0f}")
 
 st.subheader("This Week — Calendar")
-# Simple week grid
 df = pd.read_sql_query(
     """
     SELECT j.id as job_id, j.scheduled_date, j.start_time, j.end_time, j.crew, j.status,
@@ -83,7 +82,6 @@ df = pd.read_sql_query(
     """,
     conn, params=(this_mon.isoformat(), this_sun.isoformat())
 )
-
 days = [this_mon + timedelta(days=i) for i in range(7)]
 cols = st.columns(7)
 for i, d in enumerate(days):

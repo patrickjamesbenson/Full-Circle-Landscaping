@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 from utils.ui import bootstrap, section
-from utils.db import get_conn
 
 conn = bootstrap()
 section("Services (Seasonal & Ongoing)", "Add/edit services and tag by season")
@@ -21,6 +20,6 @@ with st.form("add_service"):
 df = pd.DataFrame(conn.execute("SELECT id, name, description, season, is_ongoing FROM services").fetchall())
 if not df.empty:
     df["is_ongoing"] = df["is_ongoing"].map({0:"No",1:"Yes"})
-    st.dataframe(df, use_container_width=True)
+    st.dataframe(df, width='stretch')
 else:
     st.info("No services yet.")

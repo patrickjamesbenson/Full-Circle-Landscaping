@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 from utils.ui import bootstrap, section
-from utils.db import get_conn
 
 conn = bootstrap()
 section("Leads & Qualification (MQL → SQL)", "Capture and triage leads quickly")
@@ -38,7 +37,7 @@ LEFT JOIN channels c ON l.channel_id=c.id
 LEFT JOIN services s ON s.name=l.service_requested
 ORDER BY datetime(l.created_at) DESC
 """, conn)
-st.dataframe(df, use_container_width=True, height=400)
+st.dataframe(df, width='stretch', height=400)
 
 st.subheader("Qualify / Promote to Quote")
 lid = st.number_input("Lead ID", 1, None, step=1)
@@ -58,6 +57,6 @@ if st.button("Update lead"):
     st.success("Lead updated.")
 
 if st.button("Create Quote from Lead"):
-    conn.execute("INSERT INTO quotes(lead_id, created_at, status, total, notes) VALUES (?,?,?,0,'')", (lid, datetime.now().isoformat(), "Draft"))
+    conn.execute("INSERT INTO quotes(lead_id, created_at, status, total, notes) VALUES (?,?,?,0,'')", (lid, __import__("datetime").datetime.now().isoformat(), "Draft"))
     conn.commit()
     st.success("Draft quote created.")

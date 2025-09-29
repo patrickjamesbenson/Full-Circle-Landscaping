@@ -2,12 +2,10 @@ import streamlit as st
 import pandas as pd
 from datetime import date, timedelta
 from utils.ui import bootstrap, section
-from utils.db import get_conn
 
 conn = bootstrap()
 section("Scheduling", "Assign jobs, dates, and crew; keep 1–2 weeks ahead")
 
-# Quick calendar (next 7 days)
 st.subheader("Next 7 Days — Calendar")
 start = date.today()
 end = start + timedelta(days=6)
@@ -39,7 +37,7 @@ LEFT JOIN quotes q ON j.quote_id=q.id
 LEFT JOIN leads l ON q.lead_id=l.id
 ORDER BY COALESCE(j.scheduled_date, '9999-12-31') ASC, j.start_time ASC
 """, conn)
-st.dataframe(df, use_container_width=True, height=300)
+st.dataframe(df, width='stretch', height=300)
 
 st.subheader("Update / Assign Job")
 jid = st.number_input("Job ID", min_value=1, step=1)

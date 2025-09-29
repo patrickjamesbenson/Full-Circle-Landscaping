@@ -1,10 +1,9 @@
 import streamlit as st
 import pandas as pd
 from utils.ui import bootstrap, section
-from utils.db import get_conn
 
 conn = bootstrap()
-section("Roles & Responsibilities (Stub)", "Add role descriptions; we can expand later")
+section("Roles & Responsibilities", "Add role descriptions or edit existing")
 
 with st.form("add_role"):
     role = st.text_input("Role name")
@@ -16,4 +15,4 @@ with st.form("add_role"):
         st.success("Role added.")
 
 df = pd.read_sql_query("SELECT id, role_name, description, responsibilities FROM roles", conn)
-st.dataframe(df, use_container_width=True)
+st.dataframe(df, width='stretch')

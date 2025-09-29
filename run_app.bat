@@ -1,17 +1,33 @@
 @echo off
-setlocal
+setlocal enabledelayedexpansion
 cd /d "%~dp0"
+title Full Circle Control Centre
 echo.
-echo === Installing/Updating Python packages (this might take a minute on first run) ===
-where py >nul 2>nul
-if %errorlevel% neq 0 (
-  set PY=python
-) else (
-  set PY=py
+echo === Checking Python ===
+set "PY_EXE="
+for %%P in (py.exe python.exe python3.exe) do (
+  where %%P >nul 2>nul && set "PY_EXE=%%P" && goto :found
 )
-%PY% -m pip install --upgrade pip
-%PY% -m pip install -r requirements.txt
+:found
+if "%PY_EXE%"=="" (
+  echo Could not find Python on PATH. Install from https://www.python.org/ and try again.
+  pause
+  exit /b 1
+)
+echo Using: %PY_EXE%
 echo.
-echo === Starting the Streamlit app ===
-%PY% -m streamlit run app.py
+echo === Installing dependencies (first run takes a minute) ===
+"%PY_EXE%" -m pip install --upgrade pip
+"%PY_EXE%" -m pip install -r requirements.txt
+if errorlevel 1 (
+  echo Pip install failed.
+  pause
+  exit /b 1
+)
+echo.
+echo === Launching app ===
+"%PY_EXE%" -m streamlit run app.py
+echo.
+echo If the browser didn't open automatically, visit: http://localhost:8501
+pause
 endlocal
