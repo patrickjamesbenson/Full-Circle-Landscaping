@@ -1,9 +1,8 @@
-import streamlit as st
-import pandas as pd
+import streamlit as st, pandas as pd
 from utils.ui import bootstrap, section
 
 conn = bootstrap()
-section("Services", "Add/edit services and tag by season")
+section("Services (Seasonal & Ongoing)", "Add/edit services and tag by season")
 
 with st.form("add_service"):
     name = st.text_input("Service name")
@@ -17,9 +16,10 @@ with st.form("add_service"):
         conn.commit()
         st.success("Service added.")
 
-df = pd.DataFrame(conn.execute("SELECT id, name, description, season, is_ongoing FROM services").fetchall())
-if not df.empty:
-    df["is_ongoing"] = df["is_ongoing"].map({0:"No",1:"Yes"})
-    st.dataframe(df, width='stretch')
-else:
-    st.info("No services yet.")
+with st.expander("All services", expanded=False):
+    df = pd.read_sql_query("SELECT id, name, description, season, is_ongoing FROM services", conn)
+    if not df.empty:
+        df["is_ongoing"] = df["is_ongoing"].map({0:"No",1:"Yes"})
+        st.dataframe(df, width='stretch')
+    else:
+        st.info("No services yet.")

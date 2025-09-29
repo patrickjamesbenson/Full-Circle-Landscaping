@@ -3,9 +3,8 @@ from datetime import timedelta, date
 import pandas as pd
 from utils.ui import bootstrap, brand_hero
 
-st.set_page_config(page_title="Home", layout="wide")
-conn = bootstrap()
-
+st.set_page_config(page_title="Full Circle Control Centre", layout="wide")
+conn = bootstrap(show_logo=False)  # no floating logo on Home
 brand_hero()
 
 col1, col2, col3, col4 = st.columns(4)
@@ -73,10 +72,11 @@ st.subheader("This Week — Calendar")
 df = pd.read_sql_query(
     """
     SELECT j.id as job_id, j.scheduled_date, j.start_time, j.end_time, j.crew, j.status,
-           l.name as customer, l.suburb
+           c.first_name || ' ' || c.last_name as customer, c.suburb
     FROM jobs j
     LEFT JOIN quotes q ON j.quote_id=q.id
     LEFT JOIN leads l ON q.lead_id=l.id
+    LEFT JOIN contacts c ON l.contact_id=c.id
     WHERE date(j.scheduled_date) BETWEEN ? AND ?
     ORDER BY date(j.scheduled_date), time(j.start_time)
     """,

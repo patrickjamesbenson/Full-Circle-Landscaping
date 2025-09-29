@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
 title Full Circle Control Centre
-echo.
+
 echo === Checking Python ===
 set "PY_EXE="
 for %%P in (py.exe python.exe python3.exe) do (
@@ -14,20 +14,16 @@ if "%PY_EXE%"=="" (
   pause
   exit /b 1
 )
-echo Using: %PY_EXE%
+
 echo.
-echo === Installing dependencies (first run takes a minute) ===
+echo === Installing dependencies (first run may take a minute) ===
 "%PY_EXE%" -m pip install --upgrade pip
-"%PY_EXE%" -m pip install -r requirements.txt
-if errorlevel 1 (
-  echo Pip install failed.
-  pause
-  exit /b 1
-)
+"%PY_EXE%" -m pip install -r requirements.txt || (echo Pip failed & pause & exit /b 1)
+
 echo.
 echo === Launching app ===
-"%PY_EXE%" -m streamlit run Full_Circle-Home.py
+"%PY_EXE%" -m streamlit run app.py
 echo.
-echo If the browser didn't open automatically, visit: http://localhost:8501
+echo If the browser didn't open, visit: http://localhost:8501
 pause
 endlocal

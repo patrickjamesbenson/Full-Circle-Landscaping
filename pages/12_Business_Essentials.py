@@ -1,5 +1,4 @@
-import streamlit as st
-import pandas as pd
+import streamlit as st, pandas as pd
 from utils.ui import bootstrap, section
 
 conn = bootstrap()
@@ -18,8 +17,9 @@ with st.form("add_ess"):
         conn.commit()
         st.success("Added.")
 
-df = pd.read_sql_query("SELECT id, name, provider, cost, billing_cycle, next_due, notes FROM essentials ORDER BY date(next_due) ASC", conn)
-st.dataframe(df, width='stretch')
+with st.expander("Essentials table", expanded=False):
+    df = pd.read_sql_query("SELECT id, name, provider, cost, billing_cycle, next_due, notes FROM essentials ORDER BY date(next_due) ASC", conn)
+    st.dataframe(df, width='stretch')
 
 st.subheader("Upcoming (next 60 days)")
 df2 = pd.read_sql_query("""SELECT name, provider, cost, billing_cycle, next_due FROM essentials
