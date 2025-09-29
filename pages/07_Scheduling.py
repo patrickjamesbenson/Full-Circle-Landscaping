@@ -4,8 +4,9 @@
 import os, sys, subprocess
 import streamlit as st, pandas as pd
 from datetime import date
-from utils.ui import bootstrap, section
+from utils.ui import bootstrap, section, configure_page, footer
 from utils.xldb import read, write, next_id
+configure_page("Scheduling", home=False)
 
 bootstrap(); section("Scheduling","Assign jobs, dates, crew; keep 1–2 weeks ahead")
 APP_ROOT = os.path.dirname(os.path.dirname(__file__))
@@ -92,3 +93,4 @@ with st.expander("Jobs (schedule with names + BEFORE photos)", expanded=True):
     else:
         st.info("No jobs yet.")
 
+footer()

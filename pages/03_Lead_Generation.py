@@ -2,8 +2,9 @@
 # FILE: pages/03_Lead_Generation.py
 # =================================
 import streamlit as st, pandas as pd
-from utils.ui import bootstrap, section
+from utils.ui import bootstrap, section, configure_page, footer
 from utils.xldb import read, write, next_id
+configure_page("Lead Generation & ROI", home=False)
 
 bootstrap(); section("Lead Generation & ROI","Track channels + monthly performance")
 channels = read("Channels")
@@ -42,3 +43,4 @@ with st.expander("Monthly metrics", expanded=False):
     else:
         st.info("No monthly metrics yet.")
 
+footer()

@@ -3,8 +3,9 @@
 #   -> Delete pages/01_Vision_and_Settings.py
 # ========================================
 import streamlit as st, pandas as pd
-from utils.ui import bootstrap, section
+from utils.ui import bootstrap, section, configure_page, footer
 from utils.xldb import read, write, get_setting, set_setting
+configure_page("Values & Settings", home=False)
 
 bootstrap()
 section("Values & Settings", "Define your principles and defaults")
@@ -34,3 +35,4 @@ with st.expander("Business Settings", expanded=False):
 with st.expander("Settings table (read-only)", expanded=False):
     st.dataframe(read("Settings"), use_container_width=True)
 
+footer()

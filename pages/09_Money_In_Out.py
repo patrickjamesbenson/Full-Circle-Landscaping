@@ -1,6 +1,7 @@
 import streamlit as st, pandas as pd
-from utils.ui import bootstrap, section
+from utils.ui import bootstrap, section, configure_page, footer
 from utils.xldb import read, write, next_id
+configure_page("Money In / Money Out", home=False)
 
 bootstrap(); section("Money In / Money Out","AR, payments, and expenses")
 
@@ -33,3 +34,4 @@ with st.expander("Monthly summary", expanded=False):
         rows.append({"month":m,"paid_revenue":paid,"ar_open":ar_open,"expenses":exp,"profit_estimate":paid-exp})
     st.dataframe(pd.DataFrame(rows), use_container_width=True)
 
+footer()

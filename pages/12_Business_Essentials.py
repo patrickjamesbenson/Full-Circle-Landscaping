@@ -1,6 +1,7 @@
 import streamlit as st, pandas as pd
-from utils.ui import bootstrap, section
+from utils.ui import bootstrap, section, configure_page, footer
 from utils.xldb import read, write, next_id
+configure_page("Business Essentials", home=False)
 
 bootstrap(); section("Business Essentials","Insurance, regos, subscriptions — costs & due dates")
 
@@ -24,3 +25,4 @@ with st.expander("Upcoming (next 60 days)", expanded=False):
     cutoff = pd.Timestamp.today()+pd.Timedelta(days=60)
     st.dataframe(df[df["next_due"].notna() & (df["next_due"]<=cutoff)].sort_values("next_due"), use_container_width=True)
 
+footer()

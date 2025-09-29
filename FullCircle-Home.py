@@ -7,12 +7,12 @@ import subprocess
 import streamlit as st
 import pandas as pd
 from datetime import date, timedelta
-from utils.ui import bootstrap, section
+from utils.ui import bootstrap, section, configure_page, footer
 from utils.xldb import read
+configure_page("Home", home=True)
 
 VERSION = "v5.5"  # why: visible app versioning
 
-st.set_page_config(page_title="Home", layout="wide")
 bootstrap()  # unified header
 section("Home", "Overview & this week")
 
@@ -168,3 +168,5 @@ st.markdown(
     f"<div style='font-size:12px;opacity:.8'>© 2025 LB Lighting • Full Circle Control Centre {VERSION}</div>",
     unsafe_allow_html=True,
 )
+
+footer()

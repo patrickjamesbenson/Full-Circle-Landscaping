@@ -1,6 +1,7 @@
 import streamlit as st, pandas as pd
-from utils.ui import bootstrap, section
+from utils.ui import bootstrap, section, configure_page, footer
 from utils.xldb import read, write, next_id
+configure_page("Regular Tasks — Daily / Weekly / Monthly", home=False)
 
 bootstrap(); section("Regular Tasks — Daily / Weekly / Monthly","Internal routines")
 
@@ -21,3 +22,5 @@ with st.expander("Add task", expanded=False):
             df = pd.concat([df, pd.DataFrame([row])], ignore_index=True); write("Cadence_Tasks", df); st.success("Added.")
 with st.expander("Tasks table", expanded=False):
     st.dataframe(read("Cadence_Tasks"), use_container_width=True)
+
+footer()

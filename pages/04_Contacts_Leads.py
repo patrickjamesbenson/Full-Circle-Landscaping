@@ -2,8 +2,9 @@
 # FILE: pages/04_Contacts_Leads.py
 # =================================
 import streamlit as st, pandas as pd
-from utils.ui import bootstrap, section
+from utils.ui import bootstrap, section, configure_page, footer
 from utils.xldb import read, write, next_id
+configure_page("Contacts & Leads", home=False)
 
 bootstrap(); section("Contacts & Leads","Every lead links to a contact")
 contacts = read("Contacts"); channels = read("Channels"); services = read("Services")
@@ -50,3 +51,4 @@ with st.expander("Leads table (with names)", expanded=True):
         disp = m[["id","created_at","contact","channel","service_requested","tier","budget","timing","status","mql","sql","notes"]]
         st.dataframe(disp, use_container_width=True, hide_index=True)
 
+footer()

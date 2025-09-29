@@ -1,6 +1,7 @@
 import streamlit as st, pandas as pd
-from utils.ui import bootstrap, section
+from utils.ui import bootstrap, section, configure_page, footer
 from utils.xldb import read, write, get_setting
+configure_page("What If — Revenue Calc.", home=False)
 
 bootstrap(); section("What If — Revenue Calc.","Monthly cost, equipment, and required revenue at target GM")
 
@@ -31,3 +32,5 @@ with c2: st.metric("GM target", f"{gm:.0%}")
 with c3: st.metric("Required monthly revenue", f"${req_revenue:,.0f}")
 
 st.caption("Tip: adjust GM target above or change equipment selection to see the effect immediately.")
+
+footer()

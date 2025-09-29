@@ -1,6 +1,7 @@
 import streamlit as st, pandas as pd
-from utils.ui import bootstrap, section
+from utils.ui import bootstrap, section, configure_page, footer
 from utils.xldb import read, write, next_id
+configure_page("Services", home=False)
 
 bootstrap(); section("Services","Seasonal & ongoing")
 df = read("Services")
@@ -13,3 +14,4 @@ with st.form("svc"):
 with st.expander("Services table", expanded=False):
     st.dataframe(df.assign(is_ongoing=df["is_ongoing"].map({0:"No",1:"Yes"})), use_container_width=True)
 
+footer()

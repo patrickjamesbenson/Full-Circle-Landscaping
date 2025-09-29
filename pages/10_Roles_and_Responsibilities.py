@@ -1,6 +1,7 @@
 import streamlit as st, pandas as pd
-from utils.ui import bootstrap, section
+from utils.ui import bootstrap, section, configure_page, footer
 from utils.xldb import read, write, next_id
+configure_page("Roles & Responsibilities", home=False)
 
 bootstrap(); section("Roles & Responsibilities","Populate org + costs (used in What-If)")
 
@@ -24,3 +25,4 @@ with st.expander("Role costs (monthly)", expanded=False):
             write("Role_Costs", rc); st.success("Saved.")
     st.dataframe(read("Role_Costs"), use_container_width=True)
 
+footer()

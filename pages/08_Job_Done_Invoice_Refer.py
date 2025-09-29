@@ -8,8 +8,9 @@ from datetime import date, timedelta, datetime
 import streamlit as st
 import pandas as pd
 import streamlit.components.v1 as components
-from utils.ui import bootstrap, section
+from utils.ui import bootstrap, section, configure_page, footer
 from utils.xldb import read, write, next_id
+configure_page("Job Done → Invoice → Refer", home=False)
 
 APP_ROOT = os.path.dirname(os.path.dirname(__file__))
 UPLOADS = os.path.join(APP_ROOT, "assets", "uploads")           # legacy (kept)
@@ -187,5 +188,5 @@ with st.expander("Compare BEFORE vs AFTER", expanded=True):
                 st.caption("No AFTER photos found. Upload above.")
     else:
         st.info("Enter an existing Job ID.")
-        
-        
+
+footer()

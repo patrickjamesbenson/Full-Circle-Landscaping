@@ -3,8 +3,9 @@
 # ===========================
 import os, sys, subprocess, time
 import streamlit as st, pandas as pd
-from utils.ui import bootstrap, section
+from utils.ui import bootstrap, section, configure_page, footer
 from utils.xldb import read, write, next_id, get_setting
+configure_page("Quoting", home=False)
 
 bootstrap(); section("Quoting","Target Gross Margin applies to pricing")
 APP_ROOT = os.path.dirname(os.path.dirname(__file__))
@@ -132,3 +133,4 @@ with st.expander("Quotes table (with lead + contact + photos)", expanded=False):
                 else:
                     st.caption("No BEFORE photos for this quote.")
 
+footer()

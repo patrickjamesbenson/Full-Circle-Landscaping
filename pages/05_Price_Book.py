@@ -1,6 +1,7 @@
 import streamlit as st, pandas as pd
-from utils.ui import bootstrap, section
+from utils.ui import bootstrap, section, configure_page, footer
 from utils.xldb import read, write, next_id
+configure_page("Price Book", home=False)
 
 bootstrap(); section("Price Book","Rates used by quoting")
 df = read("Price_Book")
@@ -14,3 +15,4 @@ with st.form("pb"):
 with st.expander("Price book table", expanded=False):
     st.dataframe(read("Price_Book"), use_container_width=True)
 
+footer()
