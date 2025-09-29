@@ -1,3 +1,6 @@
+# =================================
+# FILE: pages/04_Contacts_Leads.py
+# =================================
 import streamlit as st, pandas as pd
 from utils.ui import bootstrap, section
 from utils.xldb import read, write, next_id
@@ -33,5 +36,17 @@ with st.expander("Add lead (linked to a contact)", expanded=False):
 
 with st.expander("Contacts table", expanded=False):
     st.dataframe(contacts, use_container_width=True)
-with st.expander("Leads table", expanded=False):
-    st.dataframe(read("Leads"), use_container_width=True)
+
+with st.expander("Leads table (with names)", expanded=True):
+    leads_df = read("Leads").copy()
+    if leads_df.empty:
+        st.info("No leads yet.")
+    else:
+        # Join names
+        c_small = contacts[["id","first_name","last_name"]].rename(columns={"id":"contact_id"})
+        ch_small = channels[["id","name"]].rename(columns={"id":"channel_id","name":"channel"})
+        m = leads_df.merge(c_small, on="contact_id", how="left").merge(ch_small, on="channel_id", how="left")
+        m["contact"] = (m["first_name"].fillna("") + " " + m["last_name"].fillna("")).str.strip()
+        disp = m[["id","created_at","contact","channel","service_requested","tier","budget","timing","status","mql","sql","notes"]]
+        st.dataframe(disp, use_container_width=True, hide_index=True)
+

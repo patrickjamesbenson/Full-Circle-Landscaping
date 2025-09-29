@@ -12,3 +12,4 @@ with st.form("svc"):
         df = pd.concat([df, pd.DataFrame([row])], ignore_index=True); write("Services", df); st.success("Added.")
 with st.expander("Services table", expanded=False):
     st.dataframe(df.assign(is_ongoing=df["is_ongoing"].map({0:"No",1:"Yes"})), use_container_width=True)
+

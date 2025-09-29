@@ -13,3 +13,4 @@ with st.form("pb"):
         df = pd.concat([df, pd.DataFrame([row])], ignore_index=True); write("Price_Book", df); st.success("Added.")
 with st.expander("Price book table", expanded=False):
     st.dataframe(read("Price_Book"), use_container_width=True)
+

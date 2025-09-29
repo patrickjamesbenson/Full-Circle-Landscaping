@@ -23,3 +23,4 @@ with st.expander("Upcoming (next 60 days)", expanded=False):
     df["next_due"] = pd.to_datetime(df["next_due"], errors="coerce")
     cutoff = pd.Timestamp.today()+pd.Timedelta(days=60)
     st.dataframe(df[df["next_due"].notna() & (df["next_due"]<=cutoff)].sort_values("next_due"), use_container_width=True)
+

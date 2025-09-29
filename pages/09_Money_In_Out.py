@@ -32,3 +32,4 @@ with st.expander("Monthly summary", expanded=False):
         exp = ap[ap["m"]==m]["amount"].fillna(0).sum()
         rows.append({"month":m,"paid_revenue":paid,"ar_open":ar_open,"expenses":exp,"profit_estimate":paid-exp})
     st.dataframe(pd.DataFrame(rows), use_container_width=True)
+

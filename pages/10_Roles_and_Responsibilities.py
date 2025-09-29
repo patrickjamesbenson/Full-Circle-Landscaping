@@ -23,3 +23,4 @@ with st.expander("Role costs (monthly)", expanded=False):
             else: rc = pd.concat([rc, pd.DataFrame([{"id":next_id(rc),"role_id":rid,"monthly_cost":cost}])], ignore_index=True)
             write("Role_Costs", rc); st.success("Saved.")
     st.dataframe(read("Role_Costs"), use_container_width=True)
+

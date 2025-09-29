@@ -1,9 +1,13 @@
+# =================================
+# FILE: pages/03_Lead_Generation.py
+# =================================
 import streamlit as st, pandas as pd
 from utils.ui import bootstrap, section
 from utils.xldb import read, write, next_id
 
 bootstrap(); section("Lead Generation & ROI","Track channels + monthly performance")
 channels = read("Channels")
+
 with st.expander("Channels", expanded=False):
     with st.form("add_channel"):
         cname = st.text_input("Channel name"); owner = st.text_input("Owner", value="Tony"); notes = st.text_input("Notes", value="")
@@ -28,4 +32,13 @@ with st.expander("Monthly metrics", expanded=False):
             df = stats.copy(); nid = next_id(df)
             df = pd.concat([df, pd.DataFrame([{"id":nid,"channel_id":ch_id,"month":month,"cost":cost,"leads":leads,"quotes":quotes,"jobs":jobs,"revenue":revenue}])], ignore_index=True)
             write("LeadGen_Metrics", df); stats = df; st.success("Added.")
-    st.dataframe(stats, use_container_width=True)
+    # Show channel NAME instead of ID
+    if not stats.empty:
+        name_map = dict(zip(channels["id"].astype(int), channels["name"]))
+        disp = stats.copy()
+        disp["channel"] = disp["channel_id"].astype("Int64").map(name_map)
+        disp = disp[["id","channel","month","cost","leads","quotes","jobs","revenue"]]
+        st.dataframe(disp, use_container_width=True)
+    else:
+        st.info("No monthly metrics yet.")
+
