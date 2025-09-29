@@ -1,50 +1,34 @@
-import streamlit as st
-import pandas as pd
+import streamlit as st, pandas as pd
 from utils.ui import bootstrap, section
+from utils.xldb import read, write, next_id
 
-conn = bootstrap()
-section("Money In / Money Out", "Track AR, payments, and expenses")
+bootstrap(); section("Money In / Money Out","AR, payments, and expenses")
 
-st.subheader("Accounts Receivable (Invoices)")
-df = pd.read_sql_query("SELECT id, job_id, issue_date, due_date, total, status, paid_date, paid_method FROM invoices ORDER BY date(issue_date) DESC", conn)
-st.dataframe(df, width='stretch')
+with st.expander("Invoices (AR)", expanded=False):
+    st.dataframe(read("Invoices"), use_container_width=True)
 
-st.subheader("Expenses (AP)")
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    d = st.date_input("Date")
-with col2:
-    vendor = st.text_input("Vendor")
-with col3:
-    cat = st.text_input("Category")
-with col4:
-    amt = st.number_input("Amount", 0.0, 1000000.0, 0.0)
-desc = st.text_input("Description", value="")
+with st.expander("Add expense (AP)", expanded=False):
+    ap = read("AP_Expenses"); col1,col2,col3,col4 = st.columns(4)
+    with col1: d = st.date_input("Date")
+    with col2: vendor = st.text_input("Vendor")
+    with col3: cat = st.text_input("Category")
+    with col4: amt = st.number_input("Amount", 0.0, 1000000.0, 0.0)
+    desc = st.text_input("Description", value="")
+    if st.button("Add expense"):
+        nid = next_id(ap); row = {"id":nid,"date":d.isoformat(),"vendor":vendor,"category":cat,"description":desc,"amount":amt}
+        ap = pd.concat([ap, pd.DataFrame([row])], ignore_index=True); write("AP_Expenses", ap); st.success("Added.")
 
-if st.button("Add Expense"):
-    conn.execute("INSERT INTO ap_expenses(date, vendor, category, description, amount) VALUES (?,?,?,?,?)", (d.isoformat(), vendor, cat, desc, amt))
-    conn.commit()
-    st.success("Expense added.")
+with st.expander("Expenses table", expanded=False):
+    st.dataframe(read("AP_Expenses"), use_container_width=True)
 
-df2 = pd.read_sql_query("SELECT date, vendor, category, description, amount FROM ap_expenses ORDER BY date(date) DESC", conn)
-st.dataframe(df2, width='stretch')
-
-st.subheader("Monthly Summary")
-summary = pd.read_sql_query("""
-SELECT m as month,
-       COALESCE((SELECT SUM(total) FROM invoices WHERE status='Paid' AND substr(issue_date,1,7)=m),0) as paid_revenue,
-       COALESCE((SELECT SUM(total) FROM invoices WHERE status!='Paid' AND substr(issue_date,1,7)=m),0) as ar_open,
-       COALESCE((SELECT SUM(amount) FROM ap_expenses WHERE substr(date,1,7)=m),0) as expenses
-FROM (
-  SELECT DISTINCT substr(issue_date,1,7) as m FROM invoices
-  UNION
-  SELECT DISTINCT substr(date,1,7) FROM ap_expenses
-) months
-ORDER BY month DESC
-""", conn)
-
-for col in ["paid_revenue","ar_open","expenses"]:
-    summary[col] = pd.to_numeric(summary[col], errors="coerce").fillna(0.0)
-
-summary["profit_estimate"] = summary["paid_revenue"] - summary["expenses"]
-st.dataframe(summary, width='stretch')
+with st.expander("Monthly summary", expanded=False):
+    inv = read("Invoices").copy(); ap = read("AP_Expenses").copy()
+    inv["m"] = pd.to_datetime(inv["issue_date"], errors="coerce").dt.strftime("%Y-%m"); ap["m"] = pd.to_datetime(ap["date"], errors="coerce").dt.strftime("%Y-%m")
+    months = sorted(set(inv["m"].dropna().tolist()+ap["m"].dropna().tolist()))
+    rows=[]
+    for m in months:
+        paid = inv[(inv["status"]=="Paid") & (inv["m"]==m)]["total"].fillna(0).sum()
+        ar_open = inv[(inv["status"]!="Paid") & (inv["m"]==m)]["total"].fillna(0).sum()
+        exp = ap[ap["m"]==m]["amount"].fillna(0).sum()
+        rows.append({"month":m,"paid_revenue":paid,"ar_open":ar_open,"expenses":exp,"profit_estimate":paid-exp})
+    st.dataframe(pd.DataFrame(rows), use_container_width=True)

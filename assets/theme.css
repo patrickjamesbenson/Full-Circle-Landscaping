@@ -1,9 +1,9 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Cormorant+Garamond:wght@500;600&display=swap');
-:root{--fcg-bg:#F0EBDD;--fcg-ink:#34382F;--fcg-accent:#C6723D;--fcg-olive:#6C715F;}
+:root{--fcg-bg:#F8F5EE;--fcg-ink:#34382F;--fcg-accent:#C6723D;}
 html, body, .stApp { background: var(--fcg-bg) !important; color: var(--fcg-ink); }
-h1,h2,h3 { font-family: "Cormorant Garamond", Georgia, serif; letter-spacing: .5px; }
+h1,h2,h3 { font-family: "Cormorant Garamond", Georgia, serif; letter-spacing:.2px; }
 .stMarkdown, .stTextInput, .stSelectbox, .stDataFrame { font-family: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-#fcg-fixed-logo { position: fixed; top: 10px; right: 18px; z-index: 1000; opacity:.98; }
-#fcg-fixed-logo img { width: 56px; height: auto; filter: drop-shadow(0 1px 1px rgba(0,0,0,.08)); }
-.block-container { padding-top: 2.2rem; }
+.stMetric label { font-size: .85rem !important; opacity:.9; }
+.stMetric div[data-testid="stMetricValue"] { font-size: 1.6rem !important; }
+.brand-row{display:flex;align-items:center;gap:12px;margin:-6px 0 6px 0;}
+.brand-row img{width:42px;height:42px;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.08);}
