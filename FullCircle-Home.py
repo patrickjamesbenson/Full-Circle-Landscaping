@@ -163,10 +163,5 @@ else:
     st.caption("Photos folder not found yet. Upload BEFORE photos on the Quoting page to create it.")
 
 # Footer
-st.markdown(
-    f"<hr style='opacity:.3;margin-top:24px;margin-bottom:8px'>"
-    f"<div style='font-size:12px;opacity:.8'>© 2025 LB Lighting • Full Circle Control Centre {VERSION}</div>",
-    unsafe_allow_html=True,
-)
 
 footer()

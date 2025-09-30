@@ -10,7 +10,7 @@ from .xldb import ensure_workbook, get_setting, set_setting
 # ---- App meta (env-overridable) ----
 VERSION = os.getenv("FULLCIRCLE_VERSION", "v5.5")
 OWNER = os.getenv("FULLCIRCLE_OWNER", "LB Lighting")
-PRODUCT = os.getenv("FULLCIRCLE_PRODUCT", "Full Circle Control Centre")
+PRODUCT = os.getenv("FULLCIRCLE_PRODUCT", "Small Business E2E Workflow")
 YEAR = os.getenv("FULLCIRCLE_YEAR", "2025")
 
 APP_ROOT = Path(__file__).resolve().parents[1]
